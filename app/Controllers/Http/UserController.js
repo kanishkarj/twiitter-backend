@@ -41,6 +41,51 @@ class UserController {
       const user = await User.findBy("username",username);
       return await auth.generate(user);
     }
+
+    async follow ({ request, auth, params }) {
+        const currentUser = await auth.getUser();
+        const toFollowUser = await User.findBy("username",request.all().username);
+
+        if(toFollowUser == null) {
+            return "Username not found."
+        }
+
+        const exists =  await currentUser.following().where("username",toFollowUser.username).fetch()
+
+        if(exists.rows.length == 0) {
+            try {
+                await currentUser.following().attach(toFollowUser.id);
+                return "Successfully Added to Following List."
+            } catch(error) {
+                response.send(error)
+            }
+        } else {
+            return "Already Exists."
+        }
+
+    }
+
+    async unfollow ({ request, auth, params }) {
+        const currentUser = await auth.getUser();
+        const toFollowUser = await User.findBy("username",request.all().username);
+
+        if(toFollowUser == null) {
+            return "Username not found."
+        }
+
+        const exists =  await currentUser.following().where("username",toFollowUser.username).fetch()
+
+        if(exists.rows.length == 0) {
+            return "Not following."
+        } else {
+                try {
+                    await currentUser.following().detach(toFollowUser.id);
+                    return "Successfully Removed from the Following List."
+                } catch(error) {
+                    response.send(error)
+                }
+        }
+    }
 }
 
 module.exports = UserController

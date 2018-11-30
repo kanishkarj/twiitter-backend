@@ -40,6 +40,14 @@ class User extends Model {
   static get hidden () {
     return ['password']
   }
+
+  following() {
+    return this.belongsToMany(User,"user_id","follower_id").pivotTable('followers')
+  }
+
+  followers() {
+    return this.belongsToMany(User)
+  }
 }
 
 module.exports = User
