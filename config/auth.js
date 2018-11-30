@@ -27,13 +27,13 @@ module.exports = {
   | Session authentication is always persistent.
   |
   */
-  session: {
-    serializer: 'lucid',
-    model: 'App/Models/User',
-    scheme: 'session',
-    uid: 'email',
-    password: 'password'
-  },
+  // session: {
+  //   serializer: 'lucid',
+  //   model: 'App/Models/User',
+  //   scheme: 'session',
+  //   uid: 'email',
+  //   password: 'password'
+  // },
 
   /*
   |--------------------------------------------------------------------------
@@ -48,13 +48,13 @@ module.exports = {
   | login credentials on each request.
   |
   */
-  basic: {
-    serializer: 'lucid',
-    model: 'App/Models/User',
-    scheme: 'basic',
-    uid: 'email',
-    password: 'password'
-  },
+  // basic: {
+  //   serializer: 'lucid',
+  //   model: 'App/Models/User',
+  //   scheme: 'basic',
+  //   uid: 'email',
+  //   password: 'password'
+  // },
 
   /*
   |--------------------------------------------------------------------------
@@ -69,7 +69,7 @@ module.exports = {
     serializer: 'lucid',
     model: 'App/Models/User',
     scheme: 'jwt',
-    uid: 'email',
+    uid: 'username',
     password: 'password',
     options: {
       secret: Env.get('APP_KEY')
@@ -84,11 +84,11 @@ module.exports = {
   | The Api scheme makes use of API personal tokens to authenticate a user.
   |
   */
-  api: {
-    serializer: 'lucid',
-    model: 'App/Models/User',
-    scheme: 'api',
-    uid: 'email',
-    password: 'password'
-  }
+  // api: {
+  //   serializer: 'lucid',
+  //   model: 'App/Models/User',
+  //   scheme: 'api',
+  //   uid: 'email',
+  //   password: 'password'
+  // }
 }
