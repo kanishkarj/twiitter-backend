@@ -14,6 +14,12 @@ test('Registration Check', async ({ client }) => {
     password: 'password',
   }).end()
 
+  await client.post('/register').send({
+    email: 'user@mail.com',
+    username: 'username',
+    password: 'password',
+  }).end()
+
   response.assertStatus(200)
   response.assertJSONSubset({
     email: 'temp@mail.com',
@@ -26,6 +32,7 @@ test('Registration Validation Check', async ({ client }) => {
     email: 'tempmailcom',
     username: 'tempname',
   }).end()
+  
 
   response.assertStatus(200)
   response.assertJSONSubset([{
@@ -42,6 +49,16 @@ test('Login Check', async ({ client }) => {
     password: 'password',
   }).end()
 
+  response.assertStatus(200)
+  response.assertJSONSubset({
+    email: 'temp@mail.com',
+    username: 'tempname',
+  })
+})
+
+test('Followers', async ({ client }) => {
+  const user = User.find(1);
+  const response = await client.post('/follow').loginVia(user, 'jwt')
   response.assertStatus(200)
   response.assertJSONSubset({
     email: 'temp@mail.com',

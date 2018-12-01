@@ -1,5 +1,5 @@
 'use strict'
-const { validate } = use('Validator')
+const { validateAll } = use('Validator')
 
 const User = use('App/Models/User')
 
@@ -13,9 +13,7 @@ class UserController {
     async register ({ request, response }) {
         let user = new User()
         const data = request.all()
-        const validation = await validate(request.all(), UserSignInrules).catch((error) => {
-            throw error
-        })
+        const validation = await validateAll(request.all(), UserSignInrules)
 
         if (validation.fails()) {
             response.send(validation.messages())
@@ -27,7 +25,7 @@ class UserController {
                 await user.save().catch((error) => {
                     throw error
                 })
-                response.send("Registration Successful.")
+                response.send(user)
             } catch (error) {
                 response.send(error)
             }

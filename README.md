@@ -29,3 +29,5 @@ Run the following command to run startup migrations.
 ```js
 adonis migration:run
 ```
+
+[API Documentation using Postman](https://documenter.getpostman.com/view/2521980/Rzfdqqb4#fb97eaa5-5c49-4866-9c06-e1e24224af4d)

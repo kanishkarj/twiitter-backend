@@ -1,5 +1,5 @@
 'use strict'
-const { validate } = use('Validator')
+const { validateAll } = use('Validator')
 
 const Tweet = use('App/Models/Tweet')
 const User = use('App/Models/User')
@@ -14,9 +14,7 @@ class TweetController {
     async create ({ request, response, auth}) {
         const data = request.all()
 
-        const validation = await validate(request.all(), TweetRules).catch((error) => {
-            throw error
-        })
+        const validation = await validateAll(request.all(), TweetRules)
 
         if (validation.fails()) {
             response.send(validation.messages())
@@ -35,7 +33,7 @@ class TweetController {
                 }).catch((error) => {
                     throw error
                 })
-                response.send("Tweeted Successfully.")
+                response.send(tweet)
             } catch (error) {
                 response.send(error)
             }
@@ -59,43 +57,29 @@ class TweetController {
     
     async delete ({ request, response, auth, params}) { 
         let id = request.all().id
-        try {
-            const user = await auth.getUser().catch((error) => {
-                throw error
-            })
-            const exists = await user.tweets().where('id','=',id).catch((error) => {
-                throw error
-            })
-            if(exists.row.length == 0) {
-                throw Error("You do not own the tweet.")
-            } else {
+        const user = await auth.getUser()
+        const exists = await user.tweets().where('id','=',id).fetch()
+        if(exists) {
+            try {
                 await user.tweets().where('id','=',id).delete().catch((error) => {
                     throw error
                 })
                 response.send('Deleted Successfully.')
+            } catch (error) {
+                response.send(error)
             }
-        } catch (error) {
-            response.send(error)
+        } else {
+            throw Error("You do not own the tweet.")
         }
     }
     
     async like ({ request, response, auth, params}) { 
         let id = request.all().id
         try {
-            const user = await auth.getUser().catch((error) => {
-                throw error
-            })
-            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
-                throw error
-            })
-            if(tweet.id) {
-                await tweet.likes().attach(user.id).catch((error) => {
-                    throw error
-                })
-                response.send('Liked Successfully.')
-            } else {
-                throw Error("Tweet not found.")
-            }
+            const user = await auth.getUser()
+            let tweet = await Tweet.findByOrFail('id',id)
+            await tweet.likes().attach(user.id)
+            response.send('Liked Successfully.')
         } catch (error) {
             response.send(error)
         }
@@ -147,21 +131,15 @@ class TweetController {
 
     async repost ({ request, response, auth, params}) { 
         let id = request.all().id
+        const user = await auth.getUser()
+        let tweet = await Tweet.findByOrFail('id',id)
         try {
-            const user = await auth.getUser().catch((error) => {
-                throw error
-            })
-            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
-                throw error
-            })
-            if("id" in tweet) {
-                await user.tweets().create({
+            if(tweet.id) {
+                let newTweet = await user.tweets().create({
                     title : tweet.title,
                     content : tweet.content
-                }).catch((error) => {
-                    throw error
                 })
-                response.send('Re-posted Successfully.')
+                response.send(newTweet)
             } else {
                 throw Error("Tweet not found.")
             }
