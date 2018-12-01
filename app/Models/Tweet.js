@@ -13,7 +13,7 @@ class Tweet extends Model {
         return this.belongsToMany('App/Models/User',"user_id","tweet_id").pivotTable('likes');
     }
     comments() {
-        return this.hasMany('App/Models/Comment',"tweet_id","id")
+        return this.hasMany('App/Models/Comment',"id","tweet_id")
     }
 }
 

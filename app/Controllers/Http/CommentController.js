@@ -39,7 +39,7 @@ class CommentController {
         let data = request.body;
         let comment = new Comment();
         
-        try {
+        // try {
             let user = await auth.getUser();
             let tweet = await Tweet.findBy('id',data.tweetId)
             if(tweet.id) {
@@ -52,9 +52,9 @@ class CommentController {
             } else {
                 response.send("Tweet not Found.");
             }
-        } catch (error) {
-            response.send(error);            
-        }
+        // } catch (error) {
+        //     response.send(error);            
+        // }
 
     }
 

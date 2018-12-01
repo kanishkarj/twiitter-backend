@@ -89,6 +89,7 @@ class UserController {
     }
 
     async listFollowers ({ request, response, auth, params }) {
+        let username = params.username;
         try {
             let user = await User.findByOrFail('username',username)
             response.send(await user.following().where("user_id",user.id).fetch())
@@ -98,9 +99,10 @@ class UserController {
     }
     
     async listFollowing ({ request, response, auth, params }) {
+        let username = params.username;
         try {
             let user = await User.findByOrFail('username',username)
-            response.send(await user.following().where("follower_id",user.id).fetch())
+            response.send(await user.following().fetch())
         } catch (error) {
             response.send(error)
         }
