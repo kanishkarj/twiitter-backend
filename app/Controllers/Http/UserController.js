@@ -1,5 +1,7 @@
 'use strict'
 const { validate } = use('Validator')
+const Database = use('Database')
+
 const User = require('../../Models/User');
 
 const UserSignInrules = {
@@ -86,6 +88,35 @@ class UserController {
                 }
         }
     }
+
+    async listFollowers ({ request, auth, params }) {
+        try {
+            let user = await User.findBy('username',username)
+            return await user.following().where("user_id",user.id).fetch();
+        } catch (error) {
+            return error;
+        }
+    }
+    
+    async listFollowing ({ request, auth, params }) {
+        try {
+            let user = await User.findBy('username',username)
+            return await user.following().where("follower_id",user.id).fetch();
+        } catch (error) {
+            return error;
+        }
+    }
+
+    async listTweets ({ request, auth, params }) {
+        let username = params.username; 
+        try {
+            let user = await User.findBy('username',username)
+            return await user.tweets().fetch();
+        } catch (error) {
+            return error;
+        }
+    }
+    
 }
 
 module.exports = UserController

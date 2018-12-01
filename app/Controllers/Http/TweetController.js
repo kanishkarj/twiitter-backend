@@ -1,8 +1,7 @@
 'use strict'
-const Database = use('Database')
-const TweetDB = Database.table('tweets')
 
-const Tweet = require('../../Models/Tweet');
+const Tweet = use('App/Models/Tweet');
+const User = use('App/Models/User');
 
 class TweetController {
     async create ({ request, response, auth}) {
@@ -15,15 +14,16 @@ class TweetController {
         try {
             const user = await auth.getUser();
             try {
-                return await user.tweets().create({
+                await user.tweets().create({
                     title : data.title,
                     content : data.content
                 });
+                // return
             } catch (error) {
-                response.send(error);
+                response.send("error");
             }
         } catch (error) {
-            response.send(error);
+            response.send("error");
         }
         
     }
@@ -31,12 +31,14 @@ class TweetController {
     async read ({ request, response, auth, params}) {
         let id = params.id; 
         try {
-            return await TweetDB.where('id','=',id);
+            let tweet = await Tweet.findBy("id",id);
+            tweet['user_id'] = await tweet.user().fetch();
+            return tweet;
         } catch (err) {
             return err;
         }
     }
-
+    
     async delete ({ request, response, auth, params}) { 
         let id = request.all().id;
         try {
@@ -51,6 +53,9 @@ class TweetController {
             response.send(error);
         }
     }
+    
 }
 
 module.exports = TweetController
+
+

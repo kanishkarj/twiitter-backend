@@ -46,10 +46,6 @@ class User extends Model {
     return this.belongsToMany(User,"user_id","follower_id").pivotTable('followers')
   }
 
-  followers() {
-    return this.hasMany(User,"user_id","follower_id").pivotTable('followers')
-  }
-
   tweets() {
     return this.hasMany('App/Models/Tweet');
   }

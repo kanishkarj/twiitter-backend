@@ -25,3 +25,7 @@ Route.post('/unfollow', 'UserController.unfollow')
 Route.post('/tweet/create', 'TweetController.create')
 Route.get('/tweet/:id', 'TweetController.read')
 Route.post('/tweet/delete', 'TweetController.delete')
+
+Route.get('/:username/followers', 'UserController.listFollowers')
+Route.get('/:username/following', 'UserController.listFollowing')
+Route.get('/:username/tweets', 'UserController.listTweets')
