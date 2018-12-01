@@ -13,15 +13,10 @@ class TweetController {
 
         try {
             const user = await auth.getUser();
-            try {
                 await user.tweets().create({
                     title : data.title,
                     content : data.content
                 });
-                // return
-            } catch (error) {
-                response.send("error");
-            }
         } catch (error) {
             response.send("error");
         }
@@ -33,9 +28,9 @@ class TweetController {
         try {
             let tweet = await Tweet.findBy("id",id);
             tweet['user_id'] = await tweet.user().fetch();
-            return tweet;
+            response.send(tweet);
         } catch (err) {
-            return err;
+            response.send(err);
         }
     }
     
@@ -45,7 +40,7 @@ class TweetController {
             const user = await auth.getUser();
             try {
                 await user.tweets().where('id','=',id).delete();
-                return 'Deleted Successfully.';
+                response.send('Deleted Successfully.');
             } catch (error) {
                 response.send(error);
             }
@@ -54,6 +49,43 @@ class TweetController {
         }
     }
     
+    async like ({ request, response, auth, params}) { 
+        let id = request.all().id;
+        try {
+            const user = await auth.getUser();
+            let tweet = await Tweet.findBy('id',id);
+            await tweet.likes().attach(user.id);
+            response.send('Liked Successfully.');
+        } catch (error) {
+            response.send(error);
+        }
+    }
+
+    async unlike ({ request, response, auth, params}) { 
+        let id = request.all().id;
+        try {
+            const user = await auth.getUser();
+            let tweet = await Tweet.findBy('id',id);
+            await tweet.likes().detach(user.id);
+            response.send('Un-liked Successfully.');
+        } catch (error) {
+            response.send(error);
+        }
+    }
+
+    async getLikes ({ request, response, auth, params}) { 
+        let id = params.id;
+        try {
+            let tweet = await Tweet.findBy('id',id);
+            response.send(await tweet.likes().fetch());
+        } catch (error) {
+            response.send(error);
+        }
+    }
+
+    async getAllTweets ({ request, response, auth, params}) { 
+        return await Tweet.all();
+    }
 }
 
 module.exports = TweetController

@@ -1,8 +1,7 @@
 'use strict'
 const { validate } = use('Validator')
-const Database = use('Database')
 
-const User = require('../../Models/User');
+const User = use('App/Models/User');
 
 const UserSignInrules = {
   email: 'required|email|unique:users',
@@ -31,7 +30,7 @@ class UserController {
         }
     }
 
-    async login ({ request, auth }) {
+    async login ({ request, response, auth }) {
       const { username, password } = request.all()
       
       try {
@@ -44,7 +43,7 @@ class UserController {
       return await auth.generate(user);
     }
 
-    async follow ({ request, auth, params }) {
+    async follow ({ request, response, auth, params }) {
         const currentUser = await auth.getUser();
         const toFollowUser = await User.findBy("username",request.all().username);
 
@@ -67,7 +66,7 @@ class UserController {
 
     }
 
-    async unfollow ({ request, auth, params }) {
+    async unfollow ({ request, response, auth, params }) {
         const currentUser = await auth.getUser();
         const toFollowUser = await User.findBy("username",request.all().username);
 
@@ -89,7 +88,7 @@ class UserController {
         }
     }
 
-    async listFollowers ({ request, auth, params }) {
+    async listFollowers ({ request, response, auth, params }) {
         try {
             let user = await User.findBy('username',username)
             return await user.following().where("user_id",user.id).fetch();
@@ -98,7 +97,7 @@ class UserController {
         }
     }
     
-    async listFollowing ({ request, auth, params }) {
+    async listFollowing ({ request, response, auth, params }) {
         try {
             let user = await User.findBy('username',username)
             return await user.following().where("follower_id",user.id).fetch();
@@ -107,7 +106,7 @@ class UserController {
         }
     }
 
-    async listTweets ({ request, auth, params }) {
+    async listTweets ({ request, response, auth, params }) {
         let username = params.username; 
         try {
             let user = await User.findBy('username',username)
@@ -117,6 +116,16 @@ class UserController {
         }
     }
     
+    async listLiked ({ request, response, auth, params }) {
+        let username = params.username; 
+        try {
+            let user = await User.findBy('username',username)
+            let liked = await user.liked().fetch();
+            response.send(liked);
+        } catch (error) {
+            return error;
+        }
+    }
 }
 
 module.exports = UserController

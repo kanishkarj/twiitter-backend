@@ -9,6 +9,9 @@ class Tweet extends Model {
     user() {
         return this.belongsTo('App/Models/User');
     }
+    likes() {
+        return this.belongsToMany('App/Models/User',"tweet_id","user_id").pivotTable('likes');
+    }
 }
 
 module.exports = Tweet
