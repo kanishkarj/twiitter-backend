@@ -21,3 +21,7 @@ Route.post('/register', 'UserController.register')
 Route.post('/login', 'UserController.login')
 Route.post('/follow', 'UserController.follow')
 Route.post('/unfollow', 'UserController.unfollow')
+
+Route.post('/tweet/create', 'TweetController.create')
+Route.get('/tweet/:id', 'TweetController.read')
+Route.post('/tweet/delete', 'TweetController.delete')
