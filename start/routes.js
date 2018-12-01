@@ -38,3 +38,5 @@ Route.get('/:username/likes', 'UserController.listLiked')
 
 Route.get('/comments/all/:id', 'CommentController.getAll')
 Route.post('/comments/create', 'CommentController.createCommentHead')
+Route.get('/comments/owner/:id', 'CommentController.getOwner')
+Route.get('/comments/tweet/:id', 'CommentController.getParentTweet')

@@ -11,7 +11,6 @@ class HomeController {
         } catch (error) {
             response.send('Missing or invalid jwt token')
         }
-        // response.send('Authorised');
     }
 }
 

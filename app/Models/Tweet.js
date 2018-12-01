@@ -10,7 +10,10 @@ class Tweet extends Model {
         return this.belongsTo('App/Models/User');
     }
     likes() {
-        return this.belongsToMany('App/Models/User',"tweet_id","user_id").pivotTable('likes');
+        return this.belongsToMany('App/Models/User',"user_id","tweet_id").pivotTable('likes');
+    }
+    comments() {
+        return this.hasMany('App/Models/Comment',"tweet_id","id")
     }
 }
 
