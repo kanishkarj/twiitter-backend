@@ -5,7 +5,7 @@ const Tweet = use('App/Models/Tweet');
 const User = use('App/Models/User');
 
 const TweetRules = {
-  title: 'required|max200',
+  title: 'required|max:200',
   content: 'required|max:1000'
 }
 
@@ -39,7 +39,7 @@ class TweetController {
     async read ({ request, response, auth, params}) {
         let id = params.id; 
         try {
-            let tweet = await Tweet.findBy("id",id);
+            let tweet = await Tweet.findByOrFail("id",id);
             tweet['user_id'] = await tweet.user().fetch();
             response.send(tweet);
         } catch (err) {
@@ -67,7 +67,7 @@ class TweetController {
         let id = request.all().id;
         try {
             const user = await auth.getUser();
-            let tweet = await Tweet.findBy('id',id);
+            let tweet = await Tweet.findByOrFail('id',id);
             if("id" in tweet) {
                 await tweet.likes().attach(user.id);
                 response.send('Liked Successfully.');
@@ -83,7 +83,7 @@ class TweetController {
         let id = request.all().id;
         try {
             const user = await auth.getUser();
-            let tweet = await Tweet.findBy('id',id);
+            let tweet = await Tweet.findByOrFail('id',id);
             if("id" in tweet) {
                 await tweet.likes().detach(user.id);
                 response.send('Un-liked Successfully.');
@@ -98,7 +98,7 @@ class TweetController {
     async getLikes ({ request, response, auth, params}) { 
         let id = params.id;
         try {
-            let tweet = await Tweet.findBy('id',id);
+            let tweet = await Tweet.findByOrFail('id',id);
             response.send(await tweet.likes().fetch());
         } catch (error) {
             response.send(error);
@@ -113,7 +113,7 @@ class TweetController {
         let id = request.all().id;
         try {
             const user = await auth.getUser();
-            let tweet = await Tweet.findBy('id',id);
+            let tweet = await Tweet.findByOrFail('id',id);
             if("id" in tweet) {
                 await user.tweets().create({
                     title : tweet.title,

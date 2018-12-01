@@ -35,3 +35,6 @@ Route.get('/:username/followers', 'UserController.listFollowers')
 Route.get('/:username/following', 'UserController.listFollowing')
 Route.get('/:username/tweets', 'UserController.listTweets')
 Route.get('/:username/likes', 'UserController.listLiked')
+
+Route.get('/comments/all/:id', 'CommentController.getAll')
+Route.post('/comments/create', 'CommentController.createCommentHead')

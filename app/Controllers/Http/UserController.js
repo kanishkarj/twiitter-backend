@@ -39,13 +39,13 @@ class UserController {
             response.send(error.message           )
       }
       
-      const user = await User.findBy("username",username)
+      const user = await User.findByOrFail("username",username)
       response.send(await auth.generate(user))
     }
 
     async follow ({ request, response, auth, params }) {
         const currentUser = await auth.getUser()
-        const toFollowUser = await User.findBy("username",request.all().username)
+        const toFollowUser = await User.findByOrFail("username",request.all().username)
 
         if(toFollowUser == null) {
             response.send("Username not found.")
@@ -68,7 +68,7 @@ class UserController {
 
     async unfollow ({ request, response, auth, params }) {
         const currentUser = await auth.getUser()
-        const toFollowUser = await User.findBy("username",request.all().username)
+        const toFollowUser = await User.findByOrFail("username",request.all().username)
 
         if(toFollowUser == null) {
             response.send("Username not found.")
@@ -90,7 +90,7 @@ class UserController {
 
     async listFollowers ({ request, response, auth, params }) {
         try {
-            let user = await User.findBy('username',username)
+            let user = await User.findByOrFail('username',username)
             response.send(await user.following().where("user_id",user.id).fetch())
         } catch (error) {
             response.send(error)
@@ -99,7 +99,7 @@ class UserController {
     
     async listFollowing ({ request, response, auth, params }) {
         try {
-            let user = await User.findBy('username',username)
+            let user = await User.findByOrFail('username',username)
             response.send(await user.following().where("follower_id",user.id).fetch())
         } catch (error) {
             response.send(error)
@@ -109,7 +109,7 @@ class UserController {
     async listTweets ({ request, response, auth, params }) {
         let username = params.username 
         try {
-            let user = await User.findBy('username',username)
+            let user = await User.findByOrFail('username',username)
             response.send(await user.tweets().fetch())
         } catch (error) {
             response.send(error)
@@ -119,7 +119,7 @@ class UserController {
     async listLiked ({ request, response, auth, params }) {
         let username = params.username 
         try {
-            let user = await User.findBy('username',username)
+            let user = await User.findByOrFail('username',username)
             let liked = await user.liked().fetch()
             response.send(liked)
         } catch (error) {
