@@ -6,7 +6,7 @@ const Hash = use('Hash')
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
-const Tweet = require('./Tweet');
+const Tweet = require('./Tweet')
 
 class User extends Model {
 
@@ -47,11 +47,11 @@ class User extends Model {
   }
 
   tweets() {
-    return this.hasMany('App/Models/Tweet');
+    return this.hasMany('App/Models/Tweet')
   }
 
   liked() {
-    return this.belongsToMany('App/Models/Tweet',"tweet_id","user_id").pivotTable('likes');
+    return this.belongsToMany('App/Models/Tweet',"tweet_id","user_id").pivotTable('likes')
   }
 }
 

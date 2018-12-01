@@ -1,8 +1,8 @@
 'use strict'
 const { validate } = use('Validator')
 
-const Tweet = use('App/Models/Tweet');
-const User = use('App/Models/User');
+const Tweet = use('App/Models/Tweet')
+const User = use('App/Models/User')
 
 const TweetRules = {
   title: 'required|max:200',
@@ -12,119 +12,161 @@ const TweetRules = {
 class TweetController {
 
     async create ({ request, response, auth}) {
-        const data = request.all();
+        const data = request.all()
 
-        const validation = await validate(request.all(), TweetRules)
+        const validation = await validate(request.all(), TweetRules).catch((error) => {
+            throw error
+        })
 
         if (validation.fails()) {
-            return validation.messages();
+            response.send(validation.messages())
         } else { 
-            let tweet = new Tweet();
-            tweet.title = data.title;        
-            tweet.content = data.content;     
+            let tweet = new Tweet()
+            tweet.title = data.title        
+            tweet.content = data.content     
     
             try {
-                const user = await auth.getUser();
+                const user = await auth.getUser().catch((error) => {
+                    throw error
+                })
                 await user.tweets().create({
                     title : data.title,
                     content : data.content
-                });
+                }).catch((error) => {
+                    throw error
+                })
                 response.send("Tweeted Successfully.")
             } catch (error) {
-                response.send("error");
+                response.send(error)
             }
         }
     }
 
     async read ({ request, response, auth, params}) {
-        let id = params.id; 
+        let id = params.id 
         try {
-            let tweet = await Tweet.findByOrFail("id",id);
-            tweet['user_id'] = await tweet.user().fetch();
-            response.send(tweet);
+            let tweet = await Tweet.findByOrFail("id",id).catch((error) => {
+                throw error
+            })
+            tweet['user_id'] = await tweet.user().fetch().catch((error) => {
+                throw error
+            })
+            response.send(tweet)
         } catch (err) {
-            response.send(err);
+            response.send(err)
         }
     }
     
     async delete ({ request, response, auth, params}) { 
-        let id = request.all().id;
+        let id = request.all().id
         try {
-            const user = await auth.getUser();
-            const exists = await user.tweets().where('id','=',id);
+            const user = await auth.getUser().catch((error) => {
+                throw error
+            })
+            const exists = await user.tweets().where('id','=',id).catch((error) => {
+                throw error
+            })
             if(exists.row.length == 0) {
-                response.send('You do not own the tweet.');
+                throw Error("You do not own the tweet.")
             } else {
-                await user.tweets().where('id','=',id).delete();
-                response.send('Deleted Successfully.');
+                await user.tweets().where('id','=',id).delete().catch((error) => {
+                    throw error
+                })
+                response.send('Deleted Successfully.')
             }
         } catch (error) {
-            response.send(error);
+            response.send(error)
         }
     }
     
     async like ({ request, response, auth, params}) { 
-        let id = request.all().id;
+        let id = request.all().id
         try {
-            const user = await auth.getUser();
-            let tweet = await Tweet.findByOrFail('id',id);
-            if("id" in tweet) {
-                await tweet.likes().attach(user.id);
-                response.send('Liked Successfully.');
+            const user = await auth.getUser().catch((error) => {
+                throw error
+            })
+            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
+                throw error
+            })
+            if(tweet.id) {
+                await tweet.likes().attach(user.id).catch((error) => {
+                    throw error
+                })
+                response.send('Liked Successfully.')
             } else {
-                response.send('Tweet not found.');                
+                throw Error("Tweet not found.")
             }
         } catch (error) {
-            response.send(error);
+            response.send(error)
         }
     }
 
     async unlike ({ request, response, auth, params}) { 
-        let id = request.all().id;
+        let id = request.all().id
         try {
-            const user = await auth.getUser();
-            let tweet = await Tweet.findByOrFail('id',id);
-            if("id" in tweet) {
-                await tweet.likes().detach(user.id);
-                response.send('Un-liked Successfully.');
+            const user = await auth.getUser().catch((error) => {
+                throw error
+            })
+            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
+                throw error
+            })
+            if(tweet.id) {
+                await tweet.likes().detach(user.id).catch((error) => {
+                    throw error
+                })
+                response.send('Un-liked Successfully.')
             } else {
-                response.send('Tweet not found.');                
+                throw Error("Tweet not found.")
             }
         } catch (error) {
-            response.send(error);
+            response.send(error)
         }
     }
 
     async getLikes ({ request, response, auth, params}) { 
-        let id = params.id;
+        let id = params.id
         try {
-            let tweet = await Tweet.findByOrFail('id',id);
-            response.send(await tweet.likes().fetch());
+            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
+                throw error
+            })
+            let likes = await tweet.likes().fetch().catch((error) => {
+                throw error
+            })
+            response.send(likes)
         } catch (error) {
-            response.send(error);
+            response.send(error)
         }
     }
 
     async getAllTweets ({ request, response, auth, params}) { 
-        return await Tweet.all();
+        let tweets = await Tweet.all().catch((error) => {
+            throw error
+        })
+        response.send(tweets)
     }
 
     async repost ({ request, response, auth, params}) { 
-        let id = request.all().id;
+        let id = request.all().id
         try {
-            const user = await auth.getUser();
-            let tweet = await Tweet.findByOrFail('id',id);
+            const user = await auth.getUser().catch((error) => {
+                throw error
+            })
+            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
+                throw error
+            })
             if("id" in tweet) {
                 await user.tweets().create({
                     title : tweet.title,
                     content : tweet.content
-                });
-                response.send('Re-posted Successfully.');
+                }).catch((error) => {
+                    throw error
+                })
+                response.send('Re-posted Successfully.')
             } else {
-                response.send('Tweet not found.');                
+                throw Error("Tweet not found.")
             }
         } catch (error) {
-            response.send(error);
+            response.send(error)
         }
     }
 }

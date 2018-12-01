@@ -16,27 +16,34 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/','HomeController.authCheck')
-Route.post('/register', 'UserController.register')
-Route.post('/login', 'UserController.login')
-Route.post('/follow', 'UserController.follow')
-Route.post('/unfollow', 'UserController.unfollow')
+Route.post('/register', 'UserController.register').middleware('guest')
+Route.post('/login', 'UserController.login').middleware('guest')
+Route.post('/follow', 'UserController.follow').middleware('auth')
+Route.post('/unfollow', 'UserController.unfollow').middleware('auth')
 
-Route.post('/tweets/create', 'TweetController.create')
-Route.get('/tweets/:id', 'TweetController.read')
-Route.post('/tweets/delete', 'TweetController.delete')
-Route.post('/tweets/like/', 'TweetController.like')
-Route.post('/tweets/repost', 'TweetController.repost')
-Route.post('/tweets/unlike/', 'TweetController.like')
-Route.get('/tweets/likes/:id', 'TweetController.getLikes')
-Route.get('/tweets/', 'TweetController.getAllTweets')
 
-Route.get('/:username/followers', 'UserController.listFollowers')
-Route.get('/:username/following', 'UserController.listFollowing')
-Route.get('/:username/tweets', 'UserController.listTweets')
-Route.get('/:username/likes', 'UserController.listLiked')
+Route.group(() => {
+    Route.post('create', 'TweetController.create').middleware('auth')
+    Route.get(':id', 'TweetController.read')
+    Route.post('delete', 'TweetController.delete').middleware('auth')
+    Route.post('like/', 'TweetController.like').middleware('auth')
+    Route.post('repost', 'TweetController.repost').middleware('auth')
+    Route.post('unlike/', 'TweetController.unlike').middleware('auth')
+    Route.get('likes/:id', 'TweetController.getLikes')
+    Route.get('/', 'TweetController.getAllTweets')
+}).prefix('tweets')
 
-Route.get('/comments/all/:id', 'CommentController.getAll')
-Route.post('/comments/create', 'CommentController.createCommentHead')
-Route.get('/comments/owner/:id', 'CommentController.getOwner')
-Route.get('/comments/tweet/:id', 'CommentController.getParentTweet')
+
+Route.group(() => {
+    Route.get('followers', 'UserController.listFollowers')
+    Route.get('following', 'UserController.listFollowing')
+    Route.get('tweets', 'UserController.listTweets')
+    Route.get('likes', 'UserController.listLiked')
+}).prefix(':username')
+
+Route.group(() => {
+    Route.get('all/:id', 'CommentController.getAll')
+    Route.post('create', 'CommentController.createCommentHead').middleware('auth')
+    Route.get('owner/:id', 'CommentController.getOwner')
+    Route.get('tweet/:id', 'CommentController.getParentTweet')
+}).prefix('comments')
