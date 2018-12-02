@@ -3,9 +3,9 @@
 const { test,trait } = use('Test/Suite')('User')
 const User = use('App/Models/User')
 
-trait('DatabaseTransactions')
 trait('Test/ApiClient')
 trait('Auth/Client')
+trait('DatabaseTransactions')
 
 test('Registration Check', async ({ client }) => {
   const response = await client.post('/register').send({
@@ -43,26 +43,22 @@ test('Registration Validation Check', async ({ client }) => {
 })
 
 test('Login Check', async ({ client }) => {
-  const response = await client.post('/login').send({
+  let response = await client.post('/register').send({
     email: 'temp@mail.com',
     username: 'tempname',
     password: 'password',
   }).end()
+  response = await client.post('/login').send({
+    email: 'temp@mail.com',
+    username: 'tempname',
+    password: 'password'
+  }).type('json').end()
 
   response.assertStatus(200)
   response.assertJSONSubset({
-    email: 'temp@mail.com',
-    username: 'tempname',
+    type: 'bearer',
   })
 })
 
-test('Followers', async ({ client }) => {
-  const user = User.find(1);
-  const response = await client.post('/follow').loginVia(user, 'jwt')
-  response.assertStatus(200)
-  response.assertJSONSubset({
-    email: 'temp@mail.com',
-    username: 'tempname',
-  })
-})
+
 

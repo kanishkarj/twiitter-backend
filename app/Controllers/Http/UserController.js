@@ -36,41 +36,33 @@ class UserController {
       const { username, password } = request.all()
       
       try {
-            await auth.attempt(username, password).catch((error) => {
-                throw error
-            })
+        await auth.attempt(username, password)
+        const user = await User.findBy("username",username)
+        let token = await auth.generate(user);
+        response.send(token)
       } catch (error) {
-            response.send(error.message           )
+            response.send(error)
       }
       
-      const user = await User.findByOrFail("username",username)
-      response.send(await auth.generate(user))
     }
 
     async follow ({ request, response, auth, params }) {
-        const currentUser = await auth.getUser().catch((error) => {
-            throw error
-        })
-        const toFollowUser = await User.findByOrFail("username",request.all().username).catch((error) => {
-            throw error
-        })
-
+        const currentUser = await auth.getUser()
+        const toFollowUser = await User.findBy("username",request.all().username)
+        
         if(toFollowUser == null) {
             throw Error("Username not found.")
         }
-
-        const exists =  await currentUser.following().where("username",toFollowUser.username).fetch().catch((error) => {
-            throw error
-        })
-
+        
+        const exists = await currentUser.following().where("username",toFollowUser.username).fetch()
+        
         if(exists.rows.length == 0) {
             try {
-                await currentUser.following().attach(toFollowUser.id).catch((error) => {
-                    throw error
-                })
+                await currentUser.following().attach(toFollowUser.id)
                 response.send("Successfully Added to Following List.")
             } catch(error) {
-                response.send(error)
+                throw error
+                // response.send(error)
             }
         } else {
             throw Error("Already Exists.")
@@ -79,12 +71,8 @@ class UserController {
     }
 
     async unfollow ({ request, response, auth, params }) {
-        const currentUser = await auth.getUser().catch((error) => {
-            throw error
-        })
-        const toFollowUser = await User.findByOrFail("username",request.all().username).catch((error) => {
-            throw error
-        })
+        const currentUser = await auth.getUser()
+        const toFollowUser = await User.findByOrFail("username",request.all().username)
 
         if(toFollowUser == null) {
             throw Error("Username not found.")
@@ -98,9 +86,7 @@ class UserController {
             throw Error("Not following.")
         } else {
                 try {
-                    await currentUser.following().detach(toFollowUser.id).catch((error) => {
-                        throw error
-                    })
+                    await currentUser.following().detach(toFollowUser.id)
                     response.send("Successfully Removed from the Following List.")
                 } catch(error) {
                     response.send(error)
@@ -111,13 +97,9 @@ class UserController {
     async listFollowers ({ request, response, auth, params }) {
         let username = params.username
         try {
-            let user = await User.findByOrFail('username',username).catch((error) => {
-                throw error
-            })
-            let following = await user.following().where("user_id",user.id).fetch().catch((error) => {
-                throw error
-            })
-            response.send(following)
+            let user = await User.findBy('username',username)
+            let followers = await user.followers().fetch()
+            response.send(followers)
         } catch (error) {
             response.send(error)
         }
@@ -126,12 +108,8 @@ class UserController {
     async listFollowing ({ request, response, auth, params }) {
         let username = params.username
         try {
-            let user = await User.findByOrFail('username',username).catch((error) => {
-                throw error
-            })
-            let following = await user.following().fetch().catch((error) => {
-                throw error
-            })
+            let user = await User.findBy('username',username)
+            let following = await user.following().fetch()
             response.send(following)
         } catch (error) {
             response.send(error)
@@ -141,12 +119,8 @@ class UserController {
     async listTweets ({ request, response, auth, params }) {
         let username = params.username 
         try {
-            let user = await User.findByOrFail('username',username).catch((error) => {
-                throw error
-            })
-            let tweets = await user.tweets().fetch().catch((error) => {
-                throw error
-            })
+            let user = await User.findByOrFail('username',username)
+            let tweets = await user.tweets().fetch()
             response.send(tweets)
         } catch (error) {
             response.send(error)
@@ -156,12 +130,8 @@ class UserController {
     async listLiked ({ request, response, auth, params }) {
         let username = params.username 
         try {
-            let user = await User.findByOrFail('username',username).catch((error) => {
-                throw error
-            })
-            let liked = await user.liked().fetch().catch((error) => {
-                throw error
-            })
+            let user = await User.findByOrFail('username',username)
+            let liked = await user.liked().fetch()
             response.send(liked)
         } catch (error) {
             response.send(error)

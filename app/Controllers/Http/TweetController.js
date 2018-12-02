@@ -24,14 +24,10 @@ class TweetController {
             tweet.content = data.content     
     
             try {
-                const user = await auth.getUser().catch((error) => {
-                    throw error
-                })
+                const user = await auth.getUser()
                 await user.tweets().create({
                     title : data.title,
                     content : data.content
-                }).catch((error) => {
-                    throw error
                 })
                 response.send(tweet)
             } catch (error) {
@@ -43,12 +39,8 @@ class TweetController {
     async read ({ request, response, auth, params}) {
         let id = params.id 
         try {
-            let tweet = await Tweet.findByOrFail("id",id).catch((error) => {
-                throw error
-            })
-            tweet['user_id'] = await tweet.user().fetch().catch((error) => {
-                throw error
-            })
+            let tweet = await Tweet.findByOrFail("id",id)
+            tweet['user_id'] = await tweet.user().fetch()
             response.send(tweet)
         } catch (err) {
             response.send(err)
@@ -61,9 +53,7 @@ class TweetController {
         const exists = await user.tweets().where('id','=',id).fetch()
         if(exists) {
             try {
-                await user.tweets().where('id','=',id).delete().catch((error) => {
-                    throw error
-                })
+                await user.tweets().where('id','=',id).delete()
                 response.send('Deleted Successfully.')
             } catch (error) {
                 response.send(error)
@@ -88,16 +78,10 @@ class TweetController {
     async unlike ({ request, response, auth, params}) { 
         let id = request.all().id
         try {
-            const user = await auth.getUser().catch((error) => {
-                throw error
-            })
-            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
-                throw error
-            })
+            const user = await auth.getUser()
+            let tweet = await Tweet.findByOrFail('id',id)
             if(tweet.id) {
-                await tweet.likes().detach(user.id).catch((error) => {
-                    throw error
-                })
+                await tweet.likes().detach(user.id)
                 response.send('Un-liked Successfully.')
             } else {
                 throw Error("Tweet not found.")
@@ -110,12 +94,8 @@ class TweetController {
     async getLikes ({ request, response, auth, params}) { 
         let id = params.id
         try {
-            let tweet = await Tweet.findByOrFail('id',id).catch((error) => {
-                throw error
-            })
-            let likes = await tweet.likes().fetch().catch((error) => {
-                throw error
-            })
+            let tweet = await Tweet.findByOrFail('id',id)
+            let likes = await tweet.likes().fetch()
             response.send(likes)
         } catch (error) {
             response.send(error)
@@ -123,9 +103,7 @@ class TweetController {
     }
 
     async getAllTweets ({ request, response, auth, params}) { 
-        let tweets = await Tweet.all().catch((error) => {
-            throw error
-        })
+        let tweets = await Tweet.all()
         response.send(tweets)
     }
 
